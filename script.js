@@ -1,13 +1,18 @@
 /**
  * SOME PROBLEMS I'VE NOT FOUND THE SOLUTION:
  * 
- * - Is there toggle for style.display: none;
+ * - Is there toggle for style.display: none; ?
  * 
  * - In order to make titles text having <br> and looking like in textaria
  *    i've tried title.replaceAll('\n', `<br>`) , but it doesn't work
  *    => solution put title.replaceAll('\n', `<br>`) into the task
  * 
  * - how to make .addingField and .list not overflow the bottom of screen?
+ * 
+ * - when many btn saveEditedTask opened, they'll be all hidden when only 1 of them clicked.
+ *    How to fix this mistake?
+ * 
+ * - description has only 2rem height. how to change that?
  */
 
 
@@ -25,39 +30,9 @@ function init(){
 
   includeHTML();
 
-//  setTimeout(function(){ //setTimeout 100ms makes sure that includeHTML() is loaded completely
-//    markActive();       //before function markActive() runs.
-//  }, 100);
-
   showAllTaskTitles();
 
 }
-
-
-
-
-
-/*== HEADER =================================================*/
-
-/**
-* Function markActive marks the clicked navItem active.
-* @param {string} currentLocation - the current adress of your page
-*/
-
-// function markActive(){
-
-//   const currentLocation = location.href;
-//   let navItems = document.querySelectorAll('header nav a')
-
-//   for(let i=0; i < navItems.length; i++){
-//       if(currentLocation === navItems[i].href){
-//           navItems[i].classList.add('active')
-//       }
-//   }
-
-// }
-
-
 
 
 
@@ -127,20 +102,38 @@ function showAllTaskTitles(){
   todoList.innerHTML = ``;
   allTasks.forEach((item, i) =>{
     todoList.innerHTML += `
-      <div id="task${i}" draggable="true" onmouseover="showFunctionBtn(${i})" onmouseout="hideFunctionBtn(${i})">
-        <p>${item.title}</p>
+      <div id="task${i}" class="card" draggable="true" onmouseover="showFunctionBtn(${i})" onmouseout="hideFunctionBtn(${i})">
+        <button onclick="saveEditedTask(${i})" id="saveEditedTask${i}" class="saveEditedTaskBtn btn btn-light btn-sm">Save</button>
+        <div class="card-header bg-transparent border-light d-flex justify-content-between align-items-center">  
+          <input id="title${i}" value="${allTasks[i].title}" readonly onclick="editTask(this, ${i})">
+        </div>
         <div class="collapse" id="detail${i}">
-          <p><i>${allTasks[i].category}</i></p>
-          <p>${allTasks[i].description}</p>
-          <p>Create at ${allTasks[i].createAt}</p>
-          <p>Deadline ...${allTasks[i].deadline.replaceAll('T', ` `)}</p>
+          <div class="card-body">
+            <textarea id="description${i}" type="text" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px';" readonly  onclick="editTask(this, ${i})">${allTasks[i].description}</textarea>
+            
+            <div class="d-flex align-items-center">
+              <span >Deadline</span>
+              <input id="deadline${i}" type="datetime-local" value="${allTasks[i].deadline}" readonly  onclick="editTask(this, ${i})">
+            </div>
+          </div>
+          <div class="card-footer bg-transparent border-light">
+              <small class="text-muted d-flex justify-content-between">
+                <div onclick="showSelectCategory(this, ${i})">${allTasks[i].category}</div>
+                <select class="collapse" id="category${i}" class="mt-1 mb-2" style="display:none;">
+                  <option selected>${allTasks[i].category}</option>
+                  <option value="Client">Client</option>
+                  <option value="Product">Product</option>
+                  <option value="Management">Management</option>
+                </select>
+              </small>
+              <small class="text-muted d-flex justify-content-between">
+                <i>Created at ${allTasks[i].createdAt}</i>
+              </small>
+          </div>
         </div>
         <div class="function-btn" id="functionBtn${i}" style="display:none;">
           <button onclick="reverseChevron(this)" class="btn btn-light btn-sm" data-bs-toggle="collapse" data-bs-target="#detail${i}">
             <i class="fas fa-chevron-down"></i>
-          </button>
-          <button onclick="editTask(${i})" class="btn btn-light btn-sm">
-            <i class="fas fa-pen"></i>
           </button>
           <button id="delete${i}" onclick="delTask(${i})" class="btn btn-light btn-sm">⨉</button>
         </div>
@@ -152,6 +145,7 @@ function showAllTaskTitles(){
 function openTaskInputField(){
   document.getElementById('addATask').style.display = 'none';
   document.getElementById('addTitleField').style.display = 'block';
+  document.getElementById('addTitleField').style.backgroundColor = 'white';
 }
 
 
@@ -166,7 +160,6 @@ function hideFullAddingField(){
 }
 
 
-
 function save() {
   
   category = document.getElementById('category').value;
@@ -178,7 +171,7 @@ function save() {
     'title': title.replaceAll('\n', `<br>`),
     'description': description.replaceAll('\n', `<br>`),
     'deadline': deadline,
-    'createAt': date,
+    'createdAt': date,
   };
   
   allTasks.push(task);
@@ -209,25 +202,22 @@ function reverseChevron(thisBtn){
   thisBtn.querySelector('i').classList.toggle('fa-chevron-up')
 }
 
-function editTask(i){
-  document.getElementById(`task${i}`).innerHTML = `
-      <div class="card-header bg-transparent border-light d-flex justify-content-between align-items-center">
-          <button onclick="saveEditedTask(${i})" class="btn btn-light btn-sm">Save</button>
-          <button onclick="delTask(${i})" class="btn btn-light btn-sm">Delete</button>    
-      </div>
-      <input id="title${i}" class="form-control card" value="${allTasks[i].title}" aria-describedby="passwordHelpBlock" required>
-      <textarea id="description${i}" type="text" class="form-control card" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px';">${allTasks[i].description}</textarea>
-      <input id="deadline${i}" class="form-control" type="datetime-local" value="${allTasks[i].deadline}">
-      <select id="category${i}" class="form-select mt-1 mb-2">
-          <option selected>${allTasks[i].category}</option>
-          <option value="Client">Client</option>
-          <option value="Product">Product</option>
-          <option value="Management">Management</option>
-      </select>
+function editTask(editField, i){
+  document.getElementById(`task${i}`).innerHTML += `
+  <button onclick="saveEditedTask(${i})" id="saveEditedTask${i}" class="saveEditedTaskBtn btn btn-light btn-sm">Save</button>
   `;
+  editField.readOnly = false;
 }
+
+function showSelectCategory(thisCategory, i){
+  document.getElementById(`saveEditedTask${i}`).style = "display: block;";
+  thisCategory.style = "display:none;"
+  document.getElementById(`category${i}`).style = "display: flex;"
+}
+
 function saveEditedTask(i) {
   
+  document.getElementById(`saveEditedTask${i}`).style = "display: none;";
   let editedCategory = document.getElementById(`category${i}`).value;
   let editedTitle = document.getElementById(`title${i}`).value;
   let editedDescription = document.getElementById(`description${i}`).value;
@@ -237,7 +227,7 @@ function saveEditedTask(i) {
     'title': editedTitle.replaceAll('\n', `<br>`),
     'description': editedDescription.replaceAll('\n', `<br>`),
     'deadline': editedDeadline,
-    'createAt': date,
+    'createdAt': date,
   };
   
   allTasks.splice(i, 1, editedTask);

@@ -51,20 +51,21 @@
                     <textarea id="description" placeholder="add a description..."
                         oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px';"></textarea>
                         
-                    <input id="deadline" type="datetime-local">
-    
-                    <select id="category" class="form-select mt-1 mb-2">
+                    <select id="category" class="mt-1 mb-2">
                         <option selected>No category</option>
                         <option value="Client">Client</option>
                         <option value="Product">Product</option>
                         <option value="Management">Management</option>
                     </select>
+                    
+                    <b>Deadline</b>
+                    <input id="deadline" type="datetime-local">
                 </div>
 
                 <div class="task-buttons">
-                    <button id="showAFullAddingField" onclick="showAFullAddingField()" class="btn btn-sm">Add a full task</button>
-                    <button onclick="save()" type="button" class="btn btn-outline-light btn-sm">Save</button>
-                    <button onclick="backToAddTitleField()" type="button" class="btn btn-outline-dark btn-sm">⨉</button>
+                    <button id="showAFullAddingField" onclick="showAFullAddingField()" class="btn btn-light btn-sm">Add a full task</button>
+                    <button onclick="save()" type="button" class="btn btn-outline-dark btn-sm">Save</button>
+                    <button onclick="backToAddTitleField()" type="button" class="btn btn-close"></button>
                 </div>
             </div>
 

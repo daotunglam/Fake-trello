@@ -203,9 +203,6 @@ function reverseChevron(thisBtn){
 }
 
 function editTask(editField, i){
-  document.getElementById(`task${i}`).innerHTML += `
-  <button onclick="saveEditedTask(${i})" id="saveEditedTask${i}" class="saveEditedTaskBtn btn btn-light btn-sm">Save</button>
-  `;
   editField.readOnly = false;
 }
 

@@ -203,6 +203,7 @@ function reverseChevron(thisBtn){
 }
 
 function editTask(editField, i){
+  document.getElementById(`saveEditedTask${i}`).style.display ="block";
   editField.readOnly = false;
 }
 

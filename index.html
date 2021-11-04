@@ -21,72 +21,20 @@
     <script src="https://kit.fontawesome.com/792b9e6aab.js" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="header.css">
     <script src="script.js"></script>
 
 </head>
 
 <body onload="init()">
-    <!-- generateTodoHTML() -->
+
 
     <!-- HEADER -->
     <div w3-include-html="header.html"></div>
 
 
     <!-- MAIN -->
-    <main id="board">
+    <main id="board"></main>
 
-        <div class="list-column" id="todo">
-
-            <h6>TO DO</h6>
-            <div id="todoList" class="list" ondrop="dropTo('todoList')" ondragover="allowDrop(event)"></div>
-
-            <div id="addATask" class="addingField" onclick="openTaskInputField()">+ Add a task</div>
-            
-            <div id="addTitleField" class="addingField" style="display: none;">
-                <textarea id="title" placeholder="add a title..."
-                    oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px';"></textarea>
-                
-                <div id="fullAddingField" style="display:none;">
-                    <textarea id="description" placeholder="add a description..."
-                        oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px';"></textarea>
-                        
-                    <select id="category" class="mt-1 mb-2">
-                        <option selected>No category</option>
-                        <option value="Client">Client</option>
-                        <option value="Product">Product</option>
-                        <option value="Management">Management</option>
-                    </select>
-                    
-                    <b>Deadline</b>
-                    <input id="deadline" type="datetime-local">
-                </div>
-
-                <div class="task-buttons">
-                    <button id="showAFullAddingField" onclick="showAFullAddingField()" class="btn btn-light btn-sm">Add a full task</button>
-                    <button onclick="save()" type="button" class="btn btn-outline-dark btn-sm">Save</button>
-                    <button onclick="backToAddTitleField()" type="button" class="btn btn-close"></button>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="list-column" id="inProgress">
-            <h6>IN PROGRESS</h6>
-            <div class="list" id="inProgressList" ondrop="dropTo('inProgressList')" ondragover="allowDrop(event)"></div>
-        </div>
-
-        <div class="list-column" id="testing">
-            <h6>TESTING</h6>
-            <div class="list" id="testingList" ondrop="dropTo('testtingList')" ondragover="allowDrop(event)"></div>
-        </div>
-
-        <div class="list-column" id="done">
-            <h6>DONE</h6>
-            <div class="list" id="doneList" ondrop="drop('doneList')" ondragover="allowDrop(event)"></div>
-        </div>
-
-    </main>
 
 </body>
 

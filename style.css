@@ -77,7 +77,10 @@ header .profileLinks{
     position: absolute;
 }
 
-
+#addAColumn_mark:hover{
+    cursor: pointer;
+    color: white;
+}
 
 
 

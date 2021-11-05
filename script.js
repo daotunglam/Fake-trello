@@ -150,10 +150,10 @@ ALL FUNCTIONS FOR COLUMNS
 function renderAddAColumn(){
   let board = document.getElementById('board');
   board.innerHTML += `
-      <div class="card column" onclick="openInputField_addAColumn(this)">
+      <div class="card column">
           <div class="card-body">
 
-              <div class="card-text" id="addAColumn_mark">+ Add a column</div>
+              <div class="card-text" id="addAColumn_mark" onclick="openInputField_addAColumn()">+ Add a column</div>
 
               <form id="addAColumn_input" style="display: none;">
                   <input class="form-control" placeholder="add a column name...">
@@ -170,24 +170,24 @@ function renderAddAColumn(){
 
 
 
-function openInputField_addAColumn(thisInputField){
+function openInputField_addAColumn(){
 
   show('addAColumn_input');
   hide('addAColumn_mark');
 
-  console.log(thisInputField);
-  // thisInputField.onclick = null;
+  let a = document.getElementById('addAColumn_input')
+  let aD = window.getComputedStyle(a, null).getPropertyValue('display')
 
-  document.addEventListener('click', function(e){
-    if(!thisInputField.contains(e.target)){
-      saveNewColumn();
-      loadPage();
-    }
+  document.addEventListener('click', (e) =>{
+      console.log(aD)
+      if(aD !== 'none' && !a.contains(e.target)){
+        console.log('outside')
+      } else{
+        console.log('inside')}
   })
-
+  
+  
 }
-
-
 
 /**
  * on the field Add A Column, after filling a column name,
@@ -336,12 +336,10 @@ function renderAddATask(columnID){
 function openInputField_addATask(columnID){
   document.getElementById(`column${columnID}`).querySelector('.card-footer').innerHTML = `
     <div id="addTitleField" class="addingField">
-        <textarea id="title" placeholder="add a title..."
-            oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px';"></textarea>
+        <textarea id="title" placeholder="add a title..." oninput="resizeWith(this)"></textarea>
         
         <div id="fullAddingField" style="display:none;">
-            <textarea id="description" placeholder="add a description..."
-                oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px';"></textarea>
+            <textarea id="description" placeholder="add a description..." oninput="resizeWith(this)"></textarea>
             
             <div class="d-flex align-items-center">
                 <i>Deadline</i>
@@ -356,6 +354,11 @@ function openInputField_addATask(columnID){
         </div>
     </div>
   `;
+  // document.addEventListener('click', function(e){
+  //   if(!document.getElementById(`column${columnID}`).querySelector('#addTitleField').contains(e.target)){
+  //     console.log('outside')
+  //   }
+  // })
 }
 
 

@@ -5,6 +5,8 @@ FOR ALL BODY TAGS
 
 let allColumns = [];
 let allTasks = [];
+let is_addCOLUMN_input_opened;
+let is_addTASK_title_opened;
 
 /**
  * Funtion init makes sure that <body> (or function includeHTML) is loaded before the other functions run
@@ -14,19 +16,38 @@ function init(){
 
   includeHTML();
 
-  loadPage();
+  renderAllColumns();
 
 }
 
 /**
  * set the general functions hier to use many times below 
- * @param {} x id of the element
+ * @param {string} x id of the element
  */
 function show(x){
   document.getElementById(x).style.display = 'flex';
 }
 function hide(x){
   document.getElementById(x).style.display = 'none';
+}
+
+/**
+ * general function setting here and using many times below
+ * This function sets an array to the localstorage
+ * @param {string} key the keyname marks the array you want to create/update. on the localstorage.
+ * @param {array} array the array from your code that you want to save to localstorage.
+ */
+function saveToLocalStr(key, array){//set here and use below
+    localStorage.setItem(key, JSON.stringify(array));
+}
+
+/**
+ * general function setting here and using many times below
+ * This function get specified value from the localstorage and put in an array
+ * @param {string} key the keyname marks the value you want on the localstorage.
+ */
+function getFromLocalStr(key) { //put the key in ''
+  return JSON.parse(localStorage.getItem(key));
 }
 
 /**
@@ -38,8 +59,19 @@ function hide(x){
  function findTaskBy(id){
   currentTask = allTasks.find(task => task['id'] == id);
   currentTaskIndex = allTasks.indexOf(currentTask);
-  console.log('allTasks: ', allTasks, 'currentTask:', currentTask, 'currentTaskIndex', currentTaskIndex) 
 }
+
+/**
+ * save and close an input form when click outside it.
+ * @param {click} event 
+ */
+function saveNcloseSth(event){
+  event.stopPropagation();
+  saveNclose_addCOLUMN(event);
+  saveNclose_addTASK(event);
+}
+
+
 
 
 
@@ -90,27 +122,6 @@ function includeHTML() {
 
 
 
-/*==========================
-MAIN
-========================== */
-
-
-
-/**
- * this is the second function that run automaticaly when the page is opened.
- * 
- */
-function loadPage(){
-  renderAllColumns();
-  renderAddAColumn();
-}
-
-
-
-
-
-
-
 
 /**======================================
 ALL FUNCTIONS FOR COLUMNS
@@ -119,13 +130,16 @@ ALL FUNCTIONS FOR COLUMNS
 
 
 /**
- * show on board all columns with their names and their tasks
+ * show on main all columns with their names and their tasks
  */
  function renderAllColumns(){
-  let board = document.getElementById('board');
-  board.innerHTML = '';
+  if(getFromLocalStr('allColumns')) {allColumns = getFromLocalStr('allColumns')};
+  if(getFromLocalStr('allTasks'))   {allTasks = getFromLocalStr('allTasks')};
+  
+  let columnsContainer = document.getElementById('columnsContainer');
+  columnsContainer.innerHTML = '';
   allColumns.forEach((column, i) => {
-    board.innerHTML += `
+    columnsContainer.innerHTML += `
       <div class="column card" id="column${column.id}" onmouseover="show('delColumn${column.id}')" onmouseout="hide('delColumn${column.id}')">
         <button id="delColumn${column.id}" onclick="delColumn(${column.id}, ${i})" class="btn btn-close btn-sm border" style="display:none;"></button>
         
@@ -137,57 +151,24 @@ ALL FUNCTIONS FOR COLUMNS
         <div class="card-footer"></div>
       </div>
     `;
-    renderAddATask(column.id);
+    renderBtn_AddATask(column.id);
     renderAllTasks_onlyTitle(column);
   })
 }
 
 
 
-/**
- * show a button names Add A Column on the right the columns
- */
-function renderAddAColumn(){
-  let board = document.getElementById('board');
-  board.innerHTML += `
-      <div class="card column">
-          <div class="card-body">
-
-              <div class="card-text" id="addAColumn_mark" onclick="openInputField_addAColumn()">+ Add a column</div>
-
-              <form id="addAColumn_input" style="display: none;">
-                  <input class="form-control" placeholder="add a column name...">
-                  <div class="mt-2">
-                      <button onclick="nextNewColumn()" class="btn btn-primary btn-sm">Next new column</button>
-                      <button onclick="cancelNewColumn()" class="btn btn-close btn-sm"></button>
-                  </div>
-              </form>
-
-          </div>
-      </div>
-  `;
-}
 
 
 
-function openInputField_addAColumn(){
-
+function open_addCOLUMN_input(event){
+  event.stopPropagation();
   show('addAColumn_input');
   hide('addAColumn_mark');
-
-  let a = document.getElementById('addAColumn_input')
-  let aD = window.getComputedStyle(a, null).getPropertyValue('display')
-
-  document.addEventListener('click', (e) =>{
-      console.log(aD)
-      if(aD !== 'none' && !a.contains(e.target)){
-        console.log('outside')
-      } else{
-        console.log('inside')}
-  })
-  
-  
+  is_addCOLUMN_input_opened = true;
 }
+
+
 
 /**
  * on the field Add A Column, after filling a column name,
@@ -195,45 +176,57 @@ function openInputField_addAColumn(){
  * create a new column with title and button Add A Task
  * and open the input field Add A Column by side to continue create other column.
  */
-function nextNewColumn(){
+function nextNewColumn(event){
+  event.stopPropagation(); //stop onclick in #addColumn
   saveNewColumn();
-  loadPage();
-  openInputField_addAColumn();
+  renderAllColumns();
+  open_addCOLUMN_input();
 }
 
 
 
 function saveNewColumn(){
+
   columnName = document.querySelector('#addAColumn_input > input').value;
   column = {
     'columnName': columnName,
     'id': new Date().getTime(),
   }
   allColumns.push(column);
+
+  saveToLocalStr('allColumns', allColumns)
+
 }
 
 
 
-function cancelNewColumn(){
+function cancelNewColumn(event){
+  event.stopPropagation(); //stop onclick in #addColumn, otherwise addCOLUMN_input es opened again.
   hide('addAColumn_input');
   show('addAColumn_mark');
+  is_addCOLUMN_input_opened = false;
 }
 
 
 
 function delColumn(columnID, i){
-  currentColumn = allColumns.find(column => column.id == columnID)
-  //Del Column:
-  allColumns.splice(i, 1, currentColumn);
 
-  //Del all tasks of this column:
-  // let taskOfThisColumn = allTasks.find(task => task.columnID == columnID);
-  // console.log(taskOfThisColumn)
-  // while (taskOfThisColumn) {
-  //   taskIndex = allTasks.indexOf(taskOfThisColumn)
-  //   allTasks.splice(taskIndex, 1, taskOfThisColumn)
-  //   taskOfThisColumn = allTasks.find(task => task.columnID == columnID);
-  // }
+  //find tasks of this column
+  let allTasksOfThisColumn = allTasks.filter(task => task.columnID == columnID);
+  while(allTasksOfThisColumn.length > 0){
+    firstTaskOfthisColumn = allTasks.find(task => task.columnID == columnID);
+    index = allTasks.indexOf(firstTaskOfthisColumn)
+    //Del task of this column:
+    allTasks.splice(index, 1);
+  }
+  saveToLocalStr('allTasks', allTasks)
+
+  //Del Column:
+  allColumns.splice(i, 1);
+  saveToLocalStr('allColumns', allColumns)
+
+  renderAllColumns()
+
 }
 
 
@@ -255,7 +248,7 @@ ALL FUNCTIONS FOR TASKS
 function renderAllTasks_onlyTitle(column){
 
   tasksOfThisColumn = allTasks.filter(task => task['columnID'] == column.id);
-  console.log('allTasks: ', allTasks, 'tasksOfThisColumn:', tasksOfThisColumn) 
+  // console.log('allTasks: ', allTasks, 'tasksOfThisColumn:', tasksOfThisColumn) 
 
   let listTasks = document.getElementById(`column${column.id}`).querySelector('.list');
 
@@ -320,9 +313,10 @@ function resizeWith(thisInputField){
  * show a button names Add A Task on the end of each column
  * @param {object} column from array allColumns
  */
-function renderAddATask(columnID){
+function renderBtn_AddATask(columnID){
+  is_addTASK_input_opened = false;
   document.getElementById(`column${columnID}`).querySelector('.card-footer').innerHTML = `
-      <div class="card-text" onclick="openInputField_addATask(${columnID})">+ Add a task</div>
+      <div class="card-text" onclick="open_addTASK_title(${columnID}, event)">+ Add a task</div>
   `; 
 }
 
@@ -333,12 +327,13 @@ function renderAddATask(columnID){
 /**
  * open a field to create a new task by filling a title
  */
-function openInputField_addATask(columnID){
+function open_addTASK_title(columnID, event){
+  event.stopPropagation()
   document.getElementById(`column${columnID}`).querySelector('.card-footer').innerHTML = `
-    <div id="addTitleField" class="addingField">
+    <div id="addTask" class="addingField">
         <textarea id="title" placeholder="add a title..." oninput="resizeWith(this)"></textarea>
         
-        <div id="fullAddingField" style="display:none;">
+        <div id="addTask_full" style="display:none;">
             <textarea id="description" placeholder="add a description..." oninput="resizeWith(this)"></textarea>
             
             <div class="d-flex align-items-center">
@@ -348,14 +343,15 @@ function openInputField_addATask(columnID){
         </div>
 
         <div class="task-buttons">
-            <button id="showAFullAddingField" onclick="showAFullAddingField()" class="btn btn-light btn-sm">Add a full task</button>
+            <button id="showAddTask_full" onclick="showAddTask_full()" class="btn btn-light btn-sm">Add a full task</button>
             <button onclick="saveNewTask(${columnID})" class="btn btn-outline-dark btn-sm">Save</button>
-            <button onclick="renderAddATask(${columnID})" class="btn btn-close"></button>
+            <button onclick="renderBtn_AddATask(${columnID})" class="btn btn-close"></button>
         </div>
     </div>
   `;
+  is_addTASK_title_opened = true;
   // document.addEventListener('click', function(e){
-  //   if(!document.getElementById(`column${columnID}`).querySelector('#addTitleField').contains(e.target)){
+  //   if( ! document.getElementById('addTask').contains(e.target) ){
   //     console.log('outside')
   //   }
   // })
@@ -385,3 +381,44 @@ function saveNewTask(columnID) {
 
 }
 
+
+
+
+
+
+
+
+/**=============================================
+    SAVE AND CLOSE A DIV WHEN CLICK OUTSIDE IT
+============================================= */
+function saveNclose_addCOLUMN(event){
+
+  let c = document.getElementById('addAColumn_input').querySelector('input')
+  if(is_addCOLUMN_input_opened == true){
+    if(c.value == ''){
+      cancelNewColumn(event)
+    }else{
+      saveNewColumn();
+      renderAllColumns();
+      cancelNewColumn(event)
+    }
+  }
+
+}
+
+
+
+function saveNclose_addTASK(){
+  
+  let tt = document.getElementById('title')
+  if(is_addTASK_title_opened == true){
+    if(tt.value == ''){
+      renderAllColumns()
+    }
+    // else{
+    //   saveNewTask();
+    //   renderAllColumns();
+    // }
+  }
+
+}

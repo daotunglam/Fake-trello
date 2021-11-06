@@ -59,6 +59,8 @@ header .profileLinks{
 main{
     margin-top: 4rem; /*place for header*/
     display: flex; /*make all columns side by side*/
+    min-width: 100vw;
+    height: calc(100vh - 4rem);
     width: fit-content;
 }
 
@@ -79,24 +81,17 @@ main{
     position: absolute;
 }
 
+.column > .card-footer{
+    padding: 0;
+}
+.column > .card-footer > div{
+    padding: 1rem;
+}
+
 #addColumn:hover{
     cursor: pointer;
     color: white;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 .list {
     max-height: 22rem;
@@ -122,16 +117,29 @@ main{
     position: relative; /*act on function-btn*/
 }
 
-.addingField{
-    background-color: rgba(250,250,250, 0.3);
-    padding: 0.5rem;
+.column > .card-footer {
     position: relative; /*act on .addingField*/
-}
-.addingField:hover{
-    background-color: rgba(250,250,250, 0.7);
     cursor: pointer;
-    /* color: white; */
 }
+.column > .card-footer:hover{
+    background-color: rgba(250,250,250, 0.7);
+}
+
+#addTask_full{
+    flex-direction: column;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 textarea, input, select{
     background-color: transparent;
@@ -141,9 +149,6 @@ textarea, input, select{
     min-height: 1rem;
     max-height: 5rem;
     width: 100%;
-}
-#showAFullAddingField:hover{
-    background-color: white;
 }
 
 .deadline{

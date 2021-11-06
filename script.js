@@ -1,7 +1,7 @@
 
-/*==========================
-FOR ALL BODY TAGS 
-===========================*/
+/*=====================================================
+  FOR ALL BODY TAGS 
+======================================================*/
 
 let allColumns = [];
 let allTasks = [];
@@ -61,15 +61,6 @@ function getFromLocalStr(key) { //put the key in ''
   currentTaskIndex = allTasks.indexOf(currentTask);
 }
 
-/**
- * save and close an input form when click outside it.
- * @param {click} event 
- */
-function saveNcloseSth(event){
-  event.stopPropagation();
-  saveNclose_addCOLUMN(event);
-  saveNclose_addTASK(event);
-}
 
 
 
@@ -77,10 +68,9 @@ function saveNcloseSth(event){
 
 
 
-
-/*======================
-HTML TEMPLATES 
-======================*/
+/*===============================================
+  HTML TEMPLATES 
+===============================================*/
 
 /**
  * This Function is to include HTML snippets in HTML.
@@ -123,9 +113,9 @@ function includeHTML() {
 
 
 
-/**======================================
-ALL FUNCTIONS FOR COLUMNS
-========================================*/
+/**============================================
+  ALL FUNCTIONS FOR COLUMNS
+==============================================*/
 
 
 
@@ -161,13 +151,34 @@ ALL FUNCTIONS FOR COLUMNS
 
 
 
-function open_addCOLUMN_input(event){
-  event.stopPropagation();
+function open_addCOLUMN_input(){
   show('addAColumn_input');
   hide('addAColumn_mark');
   is_addCOLUMN_input_opened = true;
+  
+  document.addEventListener('click', function(e){
+    console.log('window clicked because of addCOLUMN')
+    if(is_addCOLUMN_input_opened == true){
+      if( !document.getElementById('addColumn').contains(e.target)){
+        saveNclose_addCOLUMN()
+      }
+    }
+  })
 }
 
+
+function saveNclose_addCOLUMN(){
+  let c = document.getElementById('addAColumn_input').querySelector('input')
+  if(is_addCOLUMN_input_opened == true){
+    if(c.value == ''){
+      cancelNewColumn()
+    }else{
+      saveNewColumn();
+      renderAllColumns();
+      cancelNewColumn()
+    }
+  }
+}
 
 
 /**
@@ -176,8 +187,7 @@ function open_addCOLUMN_input(event){
  * create a new column with title and button Add A Task
  * and open the input field Add A Column by side to continue create other column.
  */
-function nextNewColumn(event){
-  event.stopPropagation(); //stop onclick in #addColumn
+function nextNewColumn(){
   saveNewColumn();
   renderAllColumns();
   open_addCOLUMN_input();
@@ -200,8 +210,7 @@ function saveNewColumn(){
 
 
 
-function cancelNewColumn(event){
-  event.stopPropagation(); //stop onclick in #addColumn, otherwise addCOLUMN_input es opened again.
+function cancelNewColumn(){
   hide('addAColumn_input');
   show('addAColumn_mark');
   is_addCOLUMN_input_opened = false;
@@ -236,9 +245,9 @@ function delColumn(columnID, i){
 
 
 
-/**===========================
-ALL FUNCTIONS FOR TASKS
-============================ */
+/**======================================
+  ALL FUNCTIONS FOR TASKS
+========================================= */
 
 
 
@@ -268,6 +277,7 @@ function generateTasks(task){
     <div id="task${task.id}" class="card" draggable="true" onmouseover="show('functionBtn${task.id}')" onmouseout="hide('functionBtn${task.id}')">
 
       <button onclick="saveEditedTask(${task.id})" id="saveEditedTask${task.id}" class="saveEditedTaskBtn btn btn-light btn-sm">Save</button>
+      
       <div class="function-btn" id="functionBtn${task.id}" style="display:none;">
         <button onclick="reverseChevron(this)" class="btn btn-light btn-sm" data-bs-toggle="collapse" data-bs-target="#detail${task.id}">
           <i class="fas fa-chevron-down"></i>
@@ -297,6 +307,13 @@ function generateTasks(task){
 }
 
 
+
+function reverseChevron(thisChevron){
+  thisChevron.querySelector('i').classList.toggle('fa-chevron-up');
+}
+
+
+
 /**
  * resizes the input field like the size of the input content.
  * @param {HTML element} thisInputField the current Input Field that's being worked on.
@@ -308,29 +325,25 @@ function resizeWith(thisInputField){
 
 
 
-
 /**
  * show a button names Add A Task on the end of each column
  * @param {object} column from array allColumns
  */
 function renderBtn_AddATask(columnID){
-  is_addTASK_input_opened = false;
   document.getElementById(`column${columnID}`).querySelector('.card-footer').innerHTML = `
-      <div class="card-text" onclick="open_addTASK_title(${columnID}, event)">+ Add a task</div>
+    <div onclick="open_addTASK_title(${columnID}), event.stopPropagation()">+ Add a task</div>
   `; 
+  is_addTASK_title_opened = false;
 }
-
-
 
 
 
 /**
  * open a field to create a new task by filling a title
  */
-function open_addTASK_title(columnID, event){
-  event.stopPropagation()
+function open_addTASK_title(columnID){
   document.getElementById(`column${columnID}`).querySelector('.card-footer').innerHTML = `
-    <div id="addTask" class="addingField">
+    <div id="addTask">
         <textarea id="title" placeholder="add a title..." oninput="resizeWith(this)"></textarea>
         
         <div id="addTask_full" style="display:none;">
@@ -343,20 +356,43 @@ function open_addTASK_title(columnID, event){
         </div>
 
         <div class="task-buttons">
-            <button id="showAddTask_full" onclick="showAddTask_full()" class="btn btn-light btn-sm">Add a full task</button>
+            <button id="showAddTask_full" onclick="show('addTask_full'), hide('showAddTask_full')" class="btn btn-light btn-sm">Add a full task</button>
             <button onclick="saveNewTask(${columnID})" class="btn btn-outline-dark btn-sm">Save</button>
             <button onclick="renderBtn_AddATask(${columnID})" class="btn btn-close"></button>
         </div>
     </div>
   `;
   is_addTASK_title_opened = true;
-  // document.addEventListener('click', function(e){
-  //   if( ! document.getElementById('addTask').contains(e.target) ){
-  //     console.log('outside')
-  //   }
-  // })
+  
+  document.addEventListener('click', function(e){
+    console.log('window clicked because of addTASK')
+    if(is_addTASK_title_opened == true){
+  
+      if( !document.getElementById('addTask').contains(e.target) ){
+        saveNclose_addTASK(columnID)
+      }
+  
+    }
+  
+  })
 }
 
+
+
+function saveNclose_addTASK(columnID){
+  
+  let tt = document.getElementById('title')
+  if(is_addTASK_title_opened == true){
+    if(tt.value == ''){
+      renderAllColumns()
+    }
+    else{
+      saveNewTask(columnID);
+      renderAllColumns();
+    }
+  }
+
+}
 
 
 
@@ -374,51 +410,10 @@ function saveNewTask(columnID) {
   };
   
   allTasks.push(task);
+  saveToLocalStr('allTasks', allTasks);
 
   currentColumn = allColumns.find(column => column.id == columnID) //specifies this column
 
   renderAllTasks_onlyTitle(currentColumn) //render all tasks of this column
-
-}
-
-
-
-
-
-
-
-
-/**=============================================
-    SAVE AND CLOSE A DIV WHEN CLICK OUTSIDE IT
-============================================= */
-function saveNclose_addCOLUMN(event){
-
-  let c = document.getElementById('addAColumn_input').querySelector('input')
-  if(is_addCOLUMN_input_opened == true){
-    if(c.value == ''){
-      cancelNewColumn(event)
-    }else{
-      saveNewColumn();
-      renderAllColumns();
-      cancelNewColumn(event)
-    }
-  }
-
-}
-
-
-
-function saveNclose_addTASK(){
-  
-  let tt = document.getElementById('title')
-  if(is_addTASK_title_opened == true){
-    if(tt.value == ''){
-      renderAllColumns()
-    }
-    // else{
-    //   saveNewTask();
-    //   renderAllColumns();
-    // }
-  }
 
 }

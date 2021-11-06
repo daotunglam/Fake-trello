@@ -37,8 +37,8 @@
  <!-- onclick="saveNcloseSth(event)" -->
         <div id="columnsContainer"></div>
 
-        <div id="addColumn" class="card column" onclick="open_addCOLUMN_input()">
-            <div class="card-body">
+        <div class="card column">
+            <div id="addColumn" class="card-body" onclick="open_addCOLUMN_input()">
     
                 <div class="card-text" id="addAColumn_mark">+ Add a column</div>
     
@@ -46,7 +46,7 @@
                     <input class="form-control" placeholder="add a column name...">
                     <div class="mt-2">
                         <button onclick="nextNewColumn()" class="btn btn-primary btn-sm">Next new column</button>
-                        <div onclick="cancelNewColumn()" class="btn btn-close btn-sm"></div>
+                        <div onclick="cancelNewColumn(), event.stopPropagation()" class="btn btn-close btn-sm"></div>
                     </div>
                 </div>
     

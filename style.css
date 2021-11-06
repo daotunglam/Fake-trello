@@ -79,13 +79,19 @@ main{
 
 .column > .btn-close{
     position: absolute;
+    right: 0;
 }
 
 .column > .card-footer{
     padding: 0;
+    cursor: pointer;
 }
 .column > .card-footer > div{
     padding: 1rem;
+}
+
+.column > .card-footer > .card-text:hover{
+    color: white;
 }
 
 #addColumn:hover{
@@ -117,13 +123,6 @@ main{
     position: relative; /*act on function-btn*/
 }
 
-.column > .card-footer {
-    position: relative; /*act on .addingField*/
-    cursor: pointer;
-}
-.column > .card-footer:hover{
-    background-color: rgba(250,250,250, 0.7);
-}
 
 #addTask_full{
     flex-direction: column;
@@ -185,7 +184,7 @@ textarea, input, select{
     margin: 2px;
 }
 
-/*== BOARD =================================(end)*/
+/*== MAIN =================================(end)*/
 
 
 

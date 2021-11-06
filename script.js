@@ -1,13 +1,27 @@
+/** SOME PROBLEM / NOTICES:
+ *  - because of document.addEventlistener('click')
+ *    some events onclick have to have event.stopPropagation
+ *    Bute why some event don't need that?
+ *    Ex: open_addCOLUMN_input()
+ * 
+ *  - because of event.stopPropagation
+ *    addTASK inputBox doesn't close when click to open the other addTASK.
+ *    How to fix this problem?
+ */
 
 /*=====================================================
   FOR ALL BODY TAGS 
 ======================================================*/
 
+
+
 let allColumns = [];
 let allTasks = [];
 let is_addCOLUMN_input_opened;
-let is_addTASK_title_opened;
 
+
+
+// INIT ============================================start
 /**
  * Funtion init makes sure that <body> (or function includeHTML) is loaded before the other functions run
  * 
@@ -19,7 +33,11 @@ function init(){
   renderAllColumns();
 
 }
+// INIT ============================================end
 
+
+
+// SHOW HIDE A DIV =======================================start
 /**
  * set the general functions hier to use many times below 
  * @param {string} x id of the element
@@ -30,7 +48,11 @@ function show(x){
 function hide(x){
   document.getElementById(x).style.display = 'none';
 }
+// SHOW HIDE A DIV =======================================end
 
+
+
+// SAVE-GET LOCALSTORAGE ===========================================start
 /**
  * general function setting here and using many times below
  * This function sets an array to the localstorage
@@ -41,6 +63,7 @@ function saveToLocalStr(key, array){//set here and use below
     localStorage.setItem(key, JSON.stringify(array));
 }
 
+
 /**
  * general function setting here and using many times below
  * This function get specified value from the localstorage and put in an array
@@ -49,7 +72,12 @@ function saveToLocalStr(key, array){//set here and use below
 function getFromLocalStr(key) { //put the key in ''
   return JSON.parse(localStorage.getItem(key));
 }
+// SAVE-GET LOCALSTORAGE ===========================================end
 
+
+
+
+// FIND TASK BY ID ===========================================start
 /**
  * a general functions that we set hier to use many times below.
  * this function specifies an object that how it looks like and which index it has in its array.
@@ -60,7 +88,7 @@ function getFromLocalStr(key) { //put the key in ''
   currentTask = allTasks.find(task => task['id'] == id);
   currentTaskIndex = allTasks.indexOf(currentTask);
 }
-
+// FIND TASK BY ID ===========================================end
 
 
 
@@ -114,11 +142,12 @@ function includeHTML() {
 
 
 /**============================================
-  ALL FUNCTIONS FOR COLUMNS
+  COLUMNS
 ==============================================*/
 
 
 
+// RENDER ALL COLUMNS ===========================================start
 /**
  * show on main all columns with their names and their tasks
  */
@@ -131,7 +160,7 @@ function includeHTML() {
   allColumns.forEach((column, i) => {
     columnsContainer.innerHTML += `
       <div class="column card" id="column${column.id}" onmouseover="show('delColumn${column.id}')" onmouseout="hide('delColumn${column.id}')">
-        <button id="delColumn${column.id}" onclick="delColumn(${column.id}, ${i})" class="btn btn-close btn-sm border" style="display:none;"></button>
+        <button id="delColumn${column.id}" onclick="delColumn(${column.id}, ${i})" class="btn btn-close btn-sm" style="display:none;"></button>
         
         <div class="card-body">
             <h5 class="card-title">${column.columnName}</h5>
@@ -145,12 +174,11 @@ function includeHTML() {
     renderAllTasks_onlyTitle(column);
   })
 }
+// RENDER ALL COLUMNS ===========================================end
 
 
 
-
-
-
+// OPEN ADD COLUMN ===========================================start
 function open_addCOLUMN_input(){
   show('addAColumn_input');
   hide('addAColumn_mark');
@@ -165,8 +193,11 @@ function open_addCOLUMN_input(){
     }
   })
 }
+// OPEN ADD COLUMN ===========================================end
 
 
+
+// SAVE & CLOSE ADD COLUMN ===========================================start
 function saveNclose_addCOLUMN(){
   let c = document.getElementById('addAColumn_input').querySelector('input')
   if(is_addCOLUMN_input_opened == true){
@@ -179,8 +210,11 @@ function saveNclose_addCOLUMN(){
     }
   }
 }
+// SAVE & CLOSE ADD COLUMN ===========================================end
 
 
+
+// NEXT NEW COLUMN =================================================start
 /**
  * on the field Add A Column, after filling a column name,
  * click on button Next New Column to
@@ -192,9 +226,11 @@ function nextNewColumn(){
   renderAllColumns();
   open_addCOLUMN_input();
 }
+// NEXT NEW COLUMN =================================================end
 
 
 
+// SAVE NEW COLUMN =================================================start
 function saveNewColumn(){
 
   columnName = document.querySelector('#addAColumn_input > input').value;
@@ -207,17 +243,21 @@ function saveNewColumn(){
   saveToLocalStr('allColumns', allColumns)
 
 }
+// SAVE NEW COLUMN =================================================end
 
 
 
+// CANCEL NEW COLUMN =================================================start
 function cancelNewColumn(){
   hide('addAColumn_input');
   show('addAColumn_mark');
   is_addCOLUMN_input_opened = false;
 }
+// CANCEL NEW COLUMN =================================================end
 
 
 
+// DELETE A COLUMN =================================================start
 function delColumn(columnID, i){
 
   //find tasks of this column
@@ -237,6 +277,8 @@ function delColumn(columnID, i){
   renderAllColumns()
 
 }
+// DELETE A COLUMN =================================================end
+
 
 
 
@@ -246,11 +288,12 @@ function delColumn(columnID, i){
 
 
 /**======================================
-  ALL FUNCTIONS FOR TASKS
+  TASKS
 ========================================= */
 
 
 
+// RENDER ALL TASKS TITLES =================================================start
 /**
  * show the tasks on the specified column
  */
@@ -269,9 +312,11 @@ function renderAllTasks_onlyTitle(column){
   }
 
 }
+// RENDER ALL TASKS TITLES =================================================end
 
 
 
+// GENERATE TASKS TITLES =================================================start
 function generateTasks(task){
   return `
     <div id="task${task.id}" class="card" draggable="true" onmouseover="show('functionBtn${task.id}')" onmouseout="hide('functionBtn${task.id}')">
@@ -305,45 +350,52 @@ function generateTasks(task){
     </div>
   `;
 }
+// GENERATE TASKS TITLES =================================================end
 
 
 
+// REVERSE DIRECTION BUTTON CHEVRON ON THE TASK =================================================start
 function reverseChevron(thisChevron){
   thisChevron.querySelector('i').classList.toggle('fa-chevron-up');
 }
+// REVERSE DIRECTION BUTTON CHEVRON ON THE TASK =================================================end
 
 
 
+// RESIZE WIDTH OF TEXTAREA =================================================start
 /**
- * resizes the input field like the size of the input content.
- * @param {HTML element} thisInputField the current Input Field that's being worked on.
+ * resizes the textarea like the size of the input content.
+ * @param {HTML element} textarea the current textarea that's being worked on.
  */
-function resizeWith(thisInputField){
-  thisInputField.style.height = '';
-  thisInputField.style.height = thisInputField.scrollHeight + 'px';
+function resizeWith(textarea){
+  textarea.style.height = '';
+  textarea.style.height = textarea.scrollHeight + 'px';
 }
+// RESIZE WIDTH OF TEXTAREA =================================================end
 
 
 
+// BUTTON ADD-A-TASK =================================================start
 /**
  * show a button names Add A Task on the end of each column
  * @param {object} column from array allColumns
  */
 function renderBtn_AddATask(columnID){
   document.getElementById(`column${columnID}`).querySelector('.card-footer').innerHTML = `
-    <div onclick="open_addTASK_title(${columnID}), event.stopPropagation()">+ Add a task</div>
+    <div class="card-text" onclick="open_addTASK_title(${columnID}), event.stopImmediatePropagation()">+ Add a task</div>
   `; 
-  is_addTASK_title_opened = false;
 }
+// BUTTON ADD-A-TASK =================================================end
 
 
 
+// OPEN ADD-TASKTITLE =================================================start
 /**
  * open a field to create a new task by filling a title
  */
 function open_addTASK_title(columnID){
   document.getElementById(`column${columnID}`).querySelector('.card-footer').innerHTML = `
-    <div id="addTask">
+    <div id="addTask${columnID}">
         <textarea id="title" placeholder="add a title..." oninput="resizeWith(this)"></textarea>
         
         <div id="addTask_full" style="display:none;">
@@ -361,14 +413,20 @@ function open_addTASK_title(columnID){
             <button onclick="renderBtn_AddATask(${columnID})" class="btn btn-close"></button>
         </div>
     </div>
-  `;
-  is_addTASK_title_opened = true;
-  
+  `;  
+  addEvtClickToWindow(columnID);
+}
+// OPEN ADD-TASKTITLE =================================================end
+
+
+
+// ADD EVENT CLICK TO WINDOW =================================================start
+function addEvtClickToWindow(columnID){
   document.addEventListener('click', function(e){
     console.log('window clicked because of addTASK')
-    if(is_addTASK_title_opened == true){
+    if( document.getElementById(`addTask${columnID}`) ){
   
-      if( !document.getElementById('addTask').contains(e.target) ){
+      if( !document.getElementById(`addTask${columnID}`).contains(e.target) ){
         saveNclose_addTASK(columnID)
       }
   
@@ -376,15 +434,19 @@ function open_addTASK_title(columnID){
   
   })
 }
+// ADD EVENT CLICK TO WINDOW =================================================end
 
 
 
+// SAVE & CLOSE ADD-TASK =================================================start
 function saveNclose_addTASK(columnID){
   
   let tt = document.getElementById('title')
-  if(is_addTASK_title_opened == true){
+  if( document.getElementById(`addTask${columnID}`) ){
     if(tt.value == ''){
-      renderAllColumns()
+      console.log(columnID)
+      renderBtn_AddATask(columnID)
+      // renderAllColumns()
     }
     else{
       saveNewTask(columnID);
@@ -393,6 +455,7 @@ function saveNclose_addTASK(columnID){
   }
 
 }
+// SAVE & CLOSE ADD-TASK =================================================end
 
 
 

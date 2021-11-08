@@ -22,14 +22,14 @@
     columnsContainer.innerHTML = '';
     allColumns.forEach((column, i) => {
       columnsContainer.innerHTML += `
-        <div class="column card" id="column${column.id}" onmouseover="show('delColumn${column.id}')" onmouseout="hide('delColumn${column.id}')">
+        <div class="column card" id="column${column.id}" ondrop="dropIn(${column.id})" ondragover="allowDrop(event)" onmouseover="show('delColumn${column.id}')" onmouseout="hide('delColumn${column.id}')">
           <button id="delColumn${column.id}" onclick="delColumn(${column.id}, ${i})" class="btn btn-close btn-sm" style="display:none;"></button>
 
           <h5 class="card-header">
             ${column.columnName}
           </h5>
           
-          <div class="list card-body" ondrop="dropTo('todoList')" ondragover="allowDrop(event)"></div>
+          <div class="list card-body"></div>
   
           <div class="card-footer"></div>
         </div>

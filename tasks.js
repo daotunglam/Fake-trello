@@ -11,6 +11,7 @@
 
 
  let is_an_addTASK_input_opened;
+ let currentTask, currentTaskIndex;
 
 
 
@@ -44,7 +45,7 @@ function renderAllTasks_onlyTitle(column){
 // GENERATE TASKS TITLES =================================================start
 function generateTasks(task){
     return `
-        <div id="task${task.id}" class="card" draggable="true" onmouseover="show('functionBtn${task.id}')" onmouseout="hide('functionBtn${task.id}')">
+        <div id="task${task.id}" class="card" draggable="true" ondragstart="drag(${task.id})" onmouseover="show('functionBtn${task.id}')" onmouseout="hide('functionBtn${task.id}')">
         
             <div class="function-btn" id="functionBtn${task.id}" style="display:none;">
                 <button onclick="reverseChevron(this)" class="btn btn-light btn-sm" data-bs-toggle="collapse" data-bs-target="#detail${task.id}">
@@ -267,3 +268,24 @@ function delTask(taskID){
 
 }
 // DELETE TASK =================================================end
+
+
+
+
+
+
+// DRAG-DROP ==========================================================start
+function allowDrop(ev){
+    ev.preventDefault()
+}
+
+function drag(taskID){
+    findTaskBy(taskID);
+}
+
+function dropIn(columnID){
+    currentTask.columnID = columnID;
+    saveToLocalStr('allTasks', allTasks);
+    renderAllColumns();
+}
+// DRAG-DROP ==========================================================end

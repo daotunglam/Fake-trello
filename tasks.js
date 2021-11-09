@@ -10,9 +10,9 @@
 
 
 
- let is_an_addTASK_input_opened;
- let currentTask, currentTaskIndex;
-
+let is_an_addTASK_input_opened;
+let currentTask, currentTaskIndex;
+let allTaskEditFields = [];
 
 
 
@@ -21,7 +21,7 @@
 /**
  * show the tasks on the specified column
  */
-function renderAllTasks_onlyTitle(column){
+function renderAllTasks_onlyTitle(column) {
 
     tasksOfThisColumn = allTasks.filter(task => task['columnID'] == column.id);
     // console.log('allTasks: ', allTasks, 'tasksOfThisColumn:', tasksOfThisColumn) 
@@ -29,8 +29,8 @@ function renderAllTasks_onlyTitle(column){
     let listTasks = document.getElementById(`column${column.id}`).querySelector('.list');
 
     listTasks.innerHTML = ``;
-    if(tasksOfThisColumn){
-        tasksOfThisColumn.forEach(task =>{
+    if (tasksOfThisColumn) {
+        tasksOfThisColumn.forEach(task => {
             listTasks.innerHTML += generateTasks(task);
         })
     }
@@ -43,7 +43,7 @@ function renderAllTasks_onlyTitle(column){
 
 
 // GENERATE TASKS TITLES =================================================start
-function generateTasks(task){
+function generateTasks(task) {
     return `
         <div id="task${task.id}" class="card" draggable="true" ondragstart="drag(${task.id})" onmouseover="show('functionBtn${task.id}')" onmouseout="hide('functionBtn${task.id}')">
         
@@ -77,8 +77,8 @@ function generateTasks(task){
 
 
 // REVERSE DIRECTION BUTTON CHEVRON ON THE TASK =================================================start
-function reverseChevron(thisChevron){
-thisChevron.querySelector('i').classList.toggle('fa-chevron-up');
+function reverseChevron(thisChevron) {
+    thisChevron.querySelector('i').classList.toggle('fa-chevron-up');
 }
 // REVERSE DIRECTION BUTTON CHEVRON ON THE TASK =================================================end
 
@@ -91,9 +91,9 @@ thisChevron.querySelector('i').classList.toggle('fa-chevron-up');
  * resizes the textarea like the size of the input content.
  * @param {HTML element} textarea the current textarea that's being worked on.
  */
-function resizeWith(textarea){
-textarea.style.height = '';
-textarea.style.height = textarea.scrollHeight + 'px';
+function resizeWith(textarea) {
+    textarea.style.height = '';
+    textarea.style.height = textarea.scrollHeight + 'px';
 }
 // RESIZE WIDTH OF TEXTAREA =================================================end
 
@@ -106,22 +106,31 @@ textarea.style.height = textarea.scrollHeight + 'px';
  * show a button names Add A Task on the end of each column
  * @param {object} column from array allColumns
  */
-function renderBtn_AddATask(columnID){
-document.getElementById(`column${columnID}`).querySelector('.card-footer').innerHTML = `
+function renderBtn_AddATask(columnID) {
+    document.getElementById(`column${columnID}`).querySelector('.card-footer').innerHTML = `
     <div class="card-text" onclick="open_addTASK_title(${columnID}), event.stopPropagation()">+ Add a task</div>
-`; 
+`;
 }
 // BUTTON ADD-A-TASK =================================================end
 
 
-
+function clossAllTasks() {
+    allTaskEditFields.forEach((taskField) => {
+        let field = document.getElementById(taskField);
+        let parent = field.parentElement;
+        parent.innerHTML = `
+        <div class="card-text" onclick="open_addTASK_title(${taskField}), event.stopPropagation()">+ Add a task</div>
+        `;
+    });
+}
 
 
 // OPEN ADD-TASKTITLE =================================================start
 /**
  * open a field to create a new task by filling a title
  */
-function open_addTASK_title(columnID){
+function open_addTASK_title(columnID) {
+    allTaskEditFields.push(`addTask${columnID}`);
     document.getElementById(`column${columnID}`).querySelector('.card-footer').innerHTML = `
         <div id="addTask${columnID}">
             <textarea id="title" placeholder="add a title..." oninput="resizeWith(this)"></textarea>
@@ -152,14 +161,13 @@ function open_addTASK_title(columnID){
 
 
 // SAVE & CLOSE ADD-TASK =================================================start
-function saveNclose_addTask(columnID){
+function saveNclose_addTask(columnID) {
 
     let tt = document.getElementById('title')
-    if( document.getElementById(`addTask${columnID}`) ){
-        if(tt.value == ''){
+    if (document.getElementById(`addTask${columnID}`)) {
+        if (tt.value == '') {
             renderBtn_AddATask(columnID)
-        }
-        else{
+        } else {
             saveNewTask(columnID);
             renderAllColumns();
         }
@@ -177,23 +185,23 @@ function saveNclose_addTask(columnID){
 // SAVE NEW TASK =================================================start
 function saveNewTask(columnID) {
 
-title = document.getElementById('title').value;
-description = document.getElementById('description').value;
-deadline = document.getElementById('deadline').value;
-let task = {
-    'id': new Date().getTime(),
-    'columnID': columnID,
-    'title': title,
-    'description': description,
-    'deadline': deadline,
-};
+    title = document.getElementById('title').value;
+    description = document.getElementById('description').value;
+    deadline = document.getElementById('deadline').value;
+    let task = {
+        'id': new Date().getTime(),
+        'columnID': columnID,
+        'title': title,
+        'description': description,
+        'deadline': deadline,
+    };
 
-allTasks.push(task);
-saveToLocalStr('allTasks', allTasks);
+    allTasks.push(task);
+    saveToLocalStr('allTasks', allTasks);
 
-currentColumn = allColumns.find(column => column.id == columnID) //specifies this column
+    currentColumn = allColumns.find(column => column.id == columnID) //specifies this column
 
-renderAllTasks_onlyTitle(currentColumn) //render all tasks of this column
+    renderAllTasks_onlyTitle(currentColumn) //render all tasks of this column
 
 }
 // SAVE NEW TASK =================================================end
@@ -203,7 +211,7 @@ renderAllTasks_onlyTitle(currentColumn) //render all tasks of this column
 
 
 // EDIT TASK =================================================start
-function editTask(taskID){
+function editTask(taskID) {
 
     let thisTask = document.getElementById(`task${taskID}`);
     thisTask.draggable = false;
@@ -225,7 +233,7 @@ function editTask(taskID){
 
 
 // SAVE EDITED TASK =================================================start
-function saveEditedTASK(taskID){
+function saveEditedTASK(taskID) {
 
     findTaskBy(taskID);
 
@@ -255,14 +263,14 @@ function saveEditedTASK(taskID){
 
 
 // DELETE TASK =================================================start
-function delTask(taskID){
+function delTask(taskID) {
 
     findTaskBy(taskID);
 
     allTasks.splice(currentTaskIndex, 1);
     saveToLocalStr('allTasks', allTasks);
 
-    currentColumn = allColumns.find(column => column.id == currentTask.columnID) 
+    currentColumn = allColumns.find(column => column.id == currentTask.columnID)
 
     renderAllTasks_onlyTitle(currentColumn) //render all tasks of current column
 
@@ -275,15 +283,15 @@ function delTask(taskID){
 
 
 // DRAG-DROP ==========================================================start
-function allowDrop(ev){
+function allowDrop(ev) {
     ev.preventDefault()
 }
 
-function drag(taskID){
+function drag(taskID) {
     findTaskBy(taskID);
 }
 
-function dropIn(columnID){
+function dropIn(columnID) {
     currentTask.columnID = columnID;
     saveToLocalStr('allTasks', allTasks);
     renderAllColumns();
